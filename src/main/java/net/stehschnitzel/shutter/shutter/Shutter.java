@@ -94,29 +94,23 @@ public class Shutter extends Block {
 			Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
 		if (!pPlayer.isCrouching() && pHand.equals(InteractionHand.MAIN_HAND)
 				&& this.material != Material.METAL) {
-			int state = pState.getValue(OPEN);
-
-			if (state == 0) {
-				this.updateAll(pLevel, pPos, 1, false);
-
-			} else if (state == 1) {
-				// check if it is possible for all shutters to update to
-				// state =
-				// 2
-				if (stateTwoPossible(pLevel, pPos, false)) {
-					this.updateAll(pLevel, pPos, 2, false);
-				} else {
-					this.updateAll(pLevel, pPos, 0, false);
-				}
-
-			} else if (state == 2) {
-				this.updateAll(pLevel, pPos, 0, false);
-			}
+			this.update(pLevel, pPos, pState.getValue(OPEN) + 1, false);
 
 			this.playSound(pLevel, pPos);
-			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.FAIL;
+	}
+
+	public void update(Level pLevel, BlockPos pPos, int state, boolean first) {
+		if (state < 2) {
+			updateAll(pLevel, pPos, state, first);
+		} else {
+			if (state == 2 && stateTwoPossible(pLevel, pPos, first)) {
+				updateAll(pLevel, pPos, 2, first);
+			} else {
+				updateAll(pLevel, pPos, 0, first);
+			}
+		}
 	}
 
 	private void updateAll(Level level, BlockPos pos, int state,
@@ -125,7 +119,7 @@ public class Shutter extends Block {
 		for (boolean up : arr) {
 			int y = pos.getY();
 
-			while ((y * y) < 100000) {
+			while (y > -70 && y < 330) {
 				BlockPos newPos = new BlockPos(pos.getX(), y, pos.getZ());
 				Block block = level.getBlockState(newPos).getBlock();
 
@@ -151,7 +145,7 @@ public class Shutter extends Block {
 		for (boolean up : arr) {
 			int y = pos.getY();
 
-			while ((y * y) < 100000) {
+			while (y > -70 && y < 330) {
 				BlockPos newPos = new BlockPos(pos.getX(), y, pos.getZ());
 				Block block = level.getBlockState(newPos).getBlock();
 
@@ -173,7 +167,7 @@ public class Shutter extends Block {
 		return true;
 	}
 
-	private void playSound(Level level, BlockPos pos) {
+	public void playSound(Level level, BlockPos pos) {
 		level.playSound(null, pos, this.getSound(level, pos).get(),
 				SoundSource.BLOCKS, 100F, 100F);
 	}
@@ -181,10 +175,10 @@ public class Shutter extends Block {
 	private RegistryObject<SoundEvent> getSound(Level level, BlockPos pos) {
 		int open = level.getBlockState(pos).getValue(OPEN);
 		return open == 0
-				? SoundInit.SHUTTER_OPEN_HALF
+				? SoundInit.SHUTTER_CLOSE
 				: open == 1 && this.canUpdate()
-						? SoundInit.SHUTTER_OPEN_FULL
-						: SoundInit.SHUTTER_CLOSE;
+						? SoundInit.SHUTTER_OPEN_HALF
+						: SoundInit.SHUTTER_OPEN_FULL;
 	}
 
 	// gets called when a block updates
@@ -196,32 +190,37 @@ public class Shutter extends Block {
 		pLevel.setBlockAndUpdate(pPos,
 				pLevel.getBlockState(pPos).setValue(POS, pos));
 
-		// For redstone or power
-		if (!(pLevel.getBlockState(pFromPos).getBlock() instanceof Shutter)) {
-			// opening
-			if (pLevel.hasNeighborSignal(pPos)) {
-				this.playSound(pLevel, pPos);
-				this.setPowered(pLevel, pPos, true);
-				if (this.stateTwoPossible(pLevel, pPos, false)) {
-					this.updateAll(pLevel, pPos, 2, false);
-				} else {
-					this.updateAll(pLevel, pPos, 1, false);
-				}
-				// closing
-			} else if (!pLevel.hasNeighborSignal(pPos)) {
-				this.playSound(pLevel, pPos);
-				this.setPowered(pLevel, pPos, false);
-				this.updateAll(pLevel, pPos, 0, false);
-			}
-		}
-
+		redstoneUpdate(pLevel, pFromPos, pPos);
+		
 		// sets the shutter to 0 when a block on the left or the right is
 		// placed
 		this.setNeighbourBlocks(pLevel, pPos);
 		if (!pLevel.isClientSide && pState.getValue(OPEN) == 2
 				&& !canUpdate()) {
+			this.update(pLevel, pPos, 0, false);
 			this.playSound(pLevel, pPos);
-			this.updateAll(pLevel, pPos, 0, false);
+		}
+	}
+
+	public void redstoneUpdate(Level pLevel, BlockPos pFromPos, BlockPos pPos) {
+		// For redstone or power
+		if (!(pLevel.getBlockState(pFromPos).getBlock() instanceof Shutter)) {
+			// opening
+			if (pLevel.hasNeighborSignal(pPos)) {
+				this.setPowered(pLevel, pPos, true);
+				if (this.stateTwoPossible(pLevel, pPos, false)) {
+					this.update(pLevel, pPos, 2, false);
+				} else {
+					this.update(pLevel, pPos, 1, false);
+				}
+				this.playSound(pLevel, pPos);
+				// closing
+			} else if (!pLevel.hasNeighborSignal(pPos)
+					&& pLevel.getBlockState(pPos).getValue(POWERED)) {
+				this.setPowered(pLevel, pPos, false);
+				this.update(pLevel, pPos, 0, false);
+				this.playSound(pLevel, pPos);
+			}
 		}
 	}
 
@@ -253,9 +252,9 @@ public class Shutter extends Block {
 
 		if (flag) {
 			if (this.stateTwoPossible(level, blockpos, true)) {
-				this.updateAll(level, blockpos, 2, true);
+				this.update(level, blockpos, 2, true);
 			} else {
-				this.updateAll(level, blockpos, 1, true);
+				this.update(level, blockpos, 1, true);
 			}
 		}
 
@@ -318,6 +317,8 @@ public class Shutter extends Block {
 		}
 		return true;
 	}
+	
+	
 
 	public void setPowered(Level level, BlockPos pos, boolean state) {
 		level.setBlockAndUpdate(pos,

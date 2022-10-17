@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -17,11 +18,42 @@ public class ShutterMain {
 
 	public ShutterMain() {
 		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-		Init.ITEMS.register(bus);
+		Init.MINECRAFT_ITEMS.register(bus);
 		Init.BLOCKS.register(bus);
-		
+
 		SoundInit.register(bus);
-		
+
+		if (ModList.get().isLoaded("create")) {
+			Init.ITEMS_CREATE.register(bus);
+		}
+
+		if (ModList.get().isLoaded("ecologics")) {
+			Init.ITEMS_ECOLOGICS.register(bus);
+		}
+
+		if (ModList.get().isLoaded("endergetic_expansison")) {
+			Init.ITEMS_ENDERGETIC.register(bus);
+		}
+
+		if (ModList.get().isLoaded("outer_end")) {
+			Init.ITEMS_OUTER_END.register(bus);
+		}
+
+		if (ModList.get().isLoaded("quark")) {
+			Init.ITEMS_QUARK.register(bus);
+		}
+
+		if (ModList.get().isLoaded("supplementaries")) {
+			Init.ITEMS_SUPPLEMENTARIES.register(bus);
+		}
+
+		if (ModList.get().isLoaded("twigs")) {
+			Init.ITEMS_TWIGS.register(bus);
+		}
+		if (ModList.get().isLoaded("oreganized")) {
+			Init.ITEMS_OREGANIZED.register(bus);
+		}
+
 		bus.addListener(this::setup);
 
 		MinecraftForge.EVENT_BUS.register(this);
@@ -46,6 +78,10 @@ public class ShutterMain {
 		ItemBlockRenderTypes.setRenderLayer(Init.SPRUCE_SHUTTER.get(),
 				RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(Init.WARPED_SHUTTER.get(),
+				RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(Init.GLASS_SHUTTER.get(),
+				RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(Init.BLOSSOM_SHUTTER.get(),
 				RenderType.translucent());
 	}
 }
