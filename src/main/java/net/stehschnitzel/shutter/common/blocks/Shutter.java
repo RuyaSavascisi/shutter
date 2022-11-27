@@ -1,4 +1,4 @@
-package net.stehschnitzel.shutter.shutter;
+package net.stehschnitzel.shutter.common.blocks;
 
 import javax.annotation.Nullable;
 
@@ -28,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.RegistryObject;
+import net.stehschnitzel.shutter.init.BlockInit;
 import net.stehschnitzel.shutter.init.SoundInit;
 
 public class Shutter extends Block {
@@ -92,13 +93,19 @@ public class Shutter extends Block {
 	@Override
 	public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
 			Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-		if (!pPlayer.isCrouching() && pHand.equals(InteractionHand.MAIN_HAND)
+		if (!pPlayer.mayBuild()) {
+
+			return InteractionResult.PASS;
+		} else if (!pPlayer.isCrouching()
+				&& pHand.equals(InteractionHand.MAIN_HAND)
 				&& this.material != Material.METAL) {
 			this.update(pLevel, pPos, pState.getValue(OPEN) + 1, false);
 
 			this.playSound(pLevel, pPos);
+			return InteractionResult.sidedSuccess(pLevel.isClientSide);
 		}
 		return InteractionResult.FAIL;
+
 	}
 
 	public void update(Level pLevel, BlockPos pPos, int state, boolean first) {
@@ -191,7 +198,7 @@ public class Shutter extends Block {
 				pLevel.getBlockState(pPos).setValue(POS, pos));
 
 		redstoneUpdate(pLevel, pFromPos, pPos);
-		
+
 		// sets the shutter to 0 when a block on the left or the right is
 		// placed
 		this.setNeighbourBlocks(pLevel, pPos);
@@ -304,6 +311,26 @@ public class Shutter extends Block {
 
 	}
 
+	@Override
+	public boolean isFlammable(BlockState state, BlockGetter level,
+			BlockPos pos, Direction direction) {
+		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get());
+	}
+	
+	@Override
+	public int getFlammability(BlockState state, BlockGetter level,
+			BlockPos pos, Direction direction) {
+		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()) ? 20 : 0;
+	}
+	
+	@Override
+	public int getFireSpreadSpeed(BlockState state, BlockGetter level,
+			BlockPos pos, Direction direction) {
+		System.out.println(this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()));
+		System.out.println(state);
+		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()) ? 5 : 0;
+	}
+	
 	private Direction getPlaceDirection(Level level, BlockPos pos) {
 		return level.getBlockState(pos).getValue(FACING);
 	}
@@ -317,8 +344,6 @@ public class Shutter extends Block {
 		}
 		return true;
 	}
-	
-	
 
 	public void setPowered(Level level, BlockPos pos, boolean state) {
 		level.setBlockAndUpdate(pos,

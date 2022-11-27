@@ -1,4 +1,4 @@
-package net.stehschnitzel.shutter.shutter;
+package net.stehschnitzel.shutter.common.blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
