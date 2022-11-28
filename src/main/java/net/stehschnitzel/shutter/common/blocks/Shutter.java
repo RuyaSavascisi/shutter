@@ -94,7 +94,6 @@ public class Shutter extends Block {
 	public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
 			Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
 		if (!pPlayer.mayBuild()) {
-
 			return InteractionResult.PASS;
 		} else if (!pPlayer.isCrouching()
 				&& pHand.equals(InteractionHand.MAIN_HAND)
@@ -204,6 +203,7 @@ public class Shutter extends Block {
 		this.setNeighbourBlocks(pLevel, pPos);
 		if (!pLevel.isClientSide && pState.getValue(OPEN) == 2
 				&& !canUpdate()) {
+			System.out.println("update");
 			this.update(pLevel, pPos, 0, false);
 			this.playSound(pLevel, pPos);
 		}
@@ -212,6 +212,7 @@ public class Shutter extends Block {
 	public void redstoneUpdate(Level pLevel, BlockPos pFromPos, BlockPos pPos) {
 		// For redstone or power
 		if (!(pLevel.getBlockState(pFromPos).getBlock() instanceof Shutter)) {
+			System.out.println("redstone");
 			// opening
 			if (pLevel.hasNeighborSignal(pPos)) {
 				this.setPowered(pLevel, pPos, true);
@@ -245,10 +246,9 @@ public class Shutter extends Block {
 			this.pos = ShutterPos.NORMAL;
 		}
 	}
-
+	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-
 		BlockPos blockpos = pContext.getClickedPos();
 		Level level = pContext.getLevel();
 
@@ -276,7 +276,6 @@ public class Shutter extends Block {
 
 		} else if (this.getBlockAbove(blockpos,
 				level) instanceof Shutter shutter) {
-
 			return this.defaultBlockState().setValue(POS, pos)
 					.setValue(OPEN,
 							level.getBlockState(blockpos.above())
@@ -285,6 +284,8 @@ public class Shutter extends Block {
 							.getValue(FACING));
 
 		}
+		System.out.println(level.hasNeighborSignal(blockpos)
+				|| level.hasNeighborSignal(blockpos.above()));
 		return this.defaultBlockState()
 				.setValue(FACING,
 						pContext.getHorizontalDirection().getOpposite())
@@ -295,7 +296,7 @@ public class Shutter extends Block {
 				.setValue(OPEN, flag ? this.canUpdate() ? 2 : 1 : 0);
 
 	}
-
+	
 	private void setNeighbourBlocks(Level level, BlockPos pos) {
 		this.sideblocks[1] = this.getPlaceDirection(level,
 				pos) == Direction.NORTH
@@ -314,23 +315,27 @@ public class Shutter extends Block {
 	@Override
 	public boolean isFlammable(BlockState state, BlockGetter level,
 			BlockPos pos, Direction direction) {
-		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get());
+		return this.material != Material.METAL
+				|| state.is(BlockInit.GLASS_SHUTTER.get());
 	}
 	
 	@Override
 	public int getFlammability(BlockState state, BlockGetter level,
 			BlockPos pos, Direction direction) {
-		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()) ? 20 : 0;
+		return this.material != Material.METAL
+				|| state.is(BlockInit.GLASS_SHUTTER.get()) ? 20 : 0;
 	}
-	
+
 	@Override
 	public int getFireSpreadSpeed(BlockState state, BlockGetter level,
 			BlockPos pos, Direction direction) {
-		System.out.println(this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()));
+		System.out.println(this.material != Material.METAL
+				|| state.is(BlockInit.GLASS_SHUTTER.get()));
 		System.out.println(state);
-		return this.material != Material.METAL || state.is(BlockInit.GLASS_SHUTTER.get()) ? 5 : 0;
+		return this.material != Material.METAL
+				|| state.is(BlockInit.GLASS_SHUTTER.get()) ? 5 : 0;
 	}
-	
+
 	private Direction getPlaceDirection(Level level, BlockPos pos) {
 		return level.getBlockState(pos).getValue(FACING);
 	}

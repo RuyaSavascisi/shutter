@@ -89,8 +89,8 @@ public class BlockInit {
 					BlockBehaviour.Properties.copy(Blocks.ACACIA_WOOD)));
 
 	// outer_end
-	public static final RegistryObject<Block> AZUER_SHUTTER = registerBlock(
-			"azuer_shutter", () -> new Shutter(
+	public static final RegistryObject<Block> AZURE_SHUTTER = registerBlock(
+			"azure_shutter", () -> new Shutter(
 					BlockBehaviour.Properties.copy(Blocks.ACACIA_WOOD)));
 
 	// quark

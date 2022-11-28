@@ -125,11 +125,12 @@ public class ItemInit {
 					BlockInit.WARPED_SHUTTER.get(),
 					new Item.Properties().tab(ShutterMain.SHUTTER_TAB)));
 
-	public static final RegistryObject<BlockItem> AZUER_SHUTTER = ITEMS_OUTER_END
-			.register("azuer_shutter",
-					() -> new BurnableItem(BlockInit.AZUER_SHUTTER.get(),
+	public static final RegistryObject<BlockItem> AZURE_SHUTTER = ITEMS_OUTER_END
+			.register("azure_shutter",
+					() -> new BurnableItem(BlockInit.AZURE_SHUTTER.get(),
 							new Item.Properties().tab(ShutterMain.SHUTTER_TAB),
 							300));
+	
 	public static final RegistryObject<BlockItem> BLOSSOM_SHUTTER = ITEMS_CREATE
 			.register("blossom_shutter",
 					() -> new BurnableItem(BlockInit.BLOSSOM_SHUTTER.get(),

@@ -4,6 +4,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.stehschnitzel.shutter.init.ItemInit;
 
 public class ShutterTab extends CreativeModeTab {
@@ -44,6 +45,17 @@ public class ShutterTab extends CreativeModeTab {
 		if(ModList.get().isLoaded("oreganized")) {
 			registerOreganized(items);
 		} 
+		if (!FMLLoader.isProduction()) {
+			registerCreate(items);
+			registerEcologics(items);
+			registerEndergetic(items);
+			registerOuterEnd(items);
+			registerQuark(items);
+			registerSupplementaries(items);
+			registerTwigs(items);
+			registerOreganized(items);
+			
+		}
 	}
 
 	private void registerMinecraftShutters(NonNullList<ItemStack> items) {
@@ -73,7 +85,7 @@ public class ShutterTab extends CreativeModeTab {
 		items.add(new ItemStack(ItemInit.POISE_SHUTTER.get()));
 	}
 	private void registerOuterEnd(NonNullList<ItemStack> items) {
-		items.add(new ItemStack(ItemInit.AZUER_SHUTTER.get()));
+		items.add(new ItemStack(ItemInit.AZURE_SHUTTER.get()));
 	}
 	private void registerQuark(NonNullList<ItemStack> items) {
 		items.add(new ItemStack(ItemInit.BLOSSOM_SHUTTER.get()));

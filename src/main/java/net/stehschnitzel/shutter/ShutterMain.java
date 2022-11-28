@@ -8,6 +8,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.stehschnitzel.shutter.init.BlockInit;
 import net.stehschnitzel.shutter.init.ItemInit;
 import net.stehschnitzel.shutter.init.SoundInit;
@@ -54,7 +55,16 @@ public class ShutterMain {
 		if (ModList.get().isLoaded("oreganized")) {
 			ItemInit.ITEMS_OREGANIZED.register(bus);
 		}
-
+		if (!FMLLoader.isProduction()) {
+			ItemInit.ITEMS_CREATE.register(bus);
+			ItemInit.ITEMS_ECOLOGICS.register(bus);
+			ItemInit.ITEMS_ENDERGETIC.register(bus);
+			ItemInit.ITEMS_OUTER_END.register(bus);
+			ItemInit.ITEMS_QUARK.register(bus);
+			ItemInit.ITEMS_SUPPLEMENTARIES.register(bus);
+			ItemInit.ITEMS_TWIGS.register(bus);
+			ItemInit.ITEMS_OREGANIZED.register(bus);
+		}
 		bus.addListener(this::setup);
 
 		MinecraftForge.EVENT_BUS.register(this);

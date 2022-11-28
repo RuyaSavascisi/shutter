@@ -17,10 +17,13 @@ public class GoldShutter extends Shutter {
 	@Override
 	public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos,
 			Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-		if (!pPlayer.isCrouching() && pHand.equals(InteractionHand.MAIN_HAND)
+		if (!pPlayer.mayBuild()) {
+			return InteractionResult.PASS;
+		} else if (!pPlayer.isCrouching() && pHand.equals(InteractionHand.MAIN_HAND)
 				&& !pLevel.getBlockState(pPos).getValue(Shutter.POWERED)) {
 			this.update(pLevel, pPos, pState.getValue(OPEN) + 1, false);
 			this.playSound(pLevel, pPos);
+			return InteractionResult.sidedSuccess(pLevel.isClientSide);
 		}
 		return InteractionResult.FAIL;
 	}
