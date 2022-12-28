@@ -45,6 +45,9 @@ public class Shutter extends Block {
 
 	public Shutter(Properties p_49795_) {
 		super(p_49795_);
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(FACING, Direction.NORTH).setValue(POWERED, false)
+				.setValue(OPEN, 0).setValue(POS, ShutterPos.NORMAL));
 	}
 
 	@Override
@@ -203,7 +206,6 @@ public class Shutter extends Block {
 		this.setNeighbourBlocks(pLevel, pPos);
 		if (!pLevel.isClientSide && pState.getValue(OPEN) == 2
 				&& !canUpdate()) {
-			System.out.println("update");
 			this.update(pLevel, pPos, 0, false);
 			this.playSound(pLevel, pPos);
 		}
@@ -212,7 +214,6 @@ public class Shutter extends Block {
 	public void redstoneUpdate(Level pLevel, BlockPos pFromPos, BlockPos pPos) {
 		// For redstone or power
 		if (!(pLevel.getBlockState(pFromPos).getBlock() instanceof Shutter)) {
-			System.out.println("redstone");
 			// opening
 			if (pLevel.hasNeighborSignal(pPos)) {
 				this.setPowered(pLevel, pPos, true);
@@ -246,7 +247,7 @@ public class Shutter extends Block {
 			this.pos = ShutterPos.NORMAL;
 		}
 	}
-	
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext pContext) {
 		BlockPos blockpos = pContext.getClickedPos();
@@ -284,8 +285,6 @@ public class Shutter extends Block {
 							.getValue(FACING));
 
 		}
-		System.out.println(level.hasNeighborSignal(blockpos)
-				|| level.hasNeighborSignal(blockpos.above()));
 		return this.defaultBlockState()
 				.setValue(FACING,
 						pContext.getHorizontalDirection().getOpposite())
@@ -296,7 +295,7 @@ public class Shutter extends Block {
 				.setValue(OPEN, flag ? this.canUpdate() ? 2 : 1 : 0);
 
 	}
-	
+
 	private void setNeighbourBlocks(Level level, BlockPos pos) {
 		this.sideblocks[1] = this.getPlaceDirection(level,
 				pos) == Direction.NORTH
@@ -318,7 +317,7 @@ public class Shutter extends Block {
 		return this.material != Material.METAL
 				|| state.is(BlockInit.GLASS_SHUTTER.get());
 	}
-	
+
 	@Override
 	public int getFlammability(BlockState state, BlockGetter level,
 			BlockPos pos, Direction direction) {
@@ -329,9 +328,6 @@ public class Shutter extends Block {
 	@Override
 	public int getFireSpreadSpeed(BlockState state, BlockGetter level,
 			BlockPos pos, Direction direction) {
-		System.out.println(this.material != Material.METAL
-				|| state.is(BlockInit.GLASS_SHUTTER.get()));
-		System.out.println(state);
 		return this.material != Material.METAL
 				|| state.is(BlockInit.GLASS_SHUTTER.get()) ? 5 : 0;
 	}
